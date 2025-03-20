@@ -1,0 +1,2 @@
+{"guildId":"1339623348237500446","guildName":"NEXUS DEVELOPMENT","createdAt":{"$$date":1742405418563},"updatedAt":{"$$date":1742405801815},"_id":"lW37DjdvoXhiHppH","featureToggles":{"moderationCommands":true,"automod":true,"logging":true,"customResponses":true}}
+{"$$indexCreated":{"fieldName":"guildId","unique":true,"sparse":false}}

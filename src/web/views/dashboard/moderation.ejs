@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Modern Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    :root {
+      --primary-color: #4b6cb7;
+      --gradient-primary: linear-gradient(to right, #4b6cb7, #182848);
+      --secondary-color: #6c757d;
+      --dark-color: #121212;
+      --light-color: #f8f9fa;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .navbar {
+      background: var(--gradient-primary) !important;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .sidebar {
+      background-color: white;
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      height: 100%;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease-in-out;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .card-header {
+      background-color: white;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
+      font-weight: 600;
+    }
+    
+    .btn-primary {
+      background: var(--gradient-primary);
+      border: none;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(to right, #3a5795, #0f1e3e);
+    }
+    
+    .nav-pills .nav-link.active {
+      background: var(--gradient-primary);
+    }
+    
+    .nav-pills .nav-link {
+      color: #4b6cb7;
+    }
+    
+    .server-icon-large {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border: 3px solid white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    
+    .server-icon-placeholder-large {
+      width: 100px;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-primary);
+      color: white;
+      font-size: 2.5rem;
+      border-radius: 50%;
+      margin: 0 auto;
+    }
+    
+    footer {
+      background: var(--dark-color) !important;
+    }
+    
+    .form-select, .form-control {
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.1);
+      padding: 10px 15px;
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--primary-color);
+      border-color: var(--primary-color);
+    }
+    
+    .badge {
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="bi bi-shield-check me-2"></i>
+        ModControl Panel
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard">Dashboard</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          <% if (user) { %>
+            <div class="dropdown">
+              <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                <% if (user.avatar) { %>
+                  <img src="https://cdn.discordapp.com/avatars/<%= user.discordId %>/<%= user.avatar %>.png" alt="<%= user.username %>" class="avatar-small me-2 rounded-circle" style="width: 24px; height: 24px; object-fit: cover;">
+                <% } else { %>
+                  <i class="bi bi-person-circle me-2"></i>
+                <% } %>
+                <%= user.username %>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="/dashboard">Dashboard</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+              </ul>
+            </div>
+          <% } else { %>
+            <a href="/auth/login" class="btn btn-outline-light">
+              <i class="bi bi-box-arrow-in-right me-2"></i> Login
+            </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Server Dashboard Content -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-lg-3 col-md-4 p-0 sidebar">
+        <div class="d-flex flex-column p-3">
+          <div class="text-center mb-4">
+            <% if (guild.iconURL) { %>
+              <img src="<%= guild.iconURL %>" alt="<%= guild.name %>" class="server-icon-large rounded-circle mb-3">
+            <% } else { %>
+              <div class="server-icon-placeholder-large mb-3">
+                <%= guild.name.charAt(0) %>
+              </div>
+            <% } %>
+            <h4><%= guild.name %></h4>
+            <p class="text-muted"><%= guild.memberCount %> members</p>
+          </div>
+          <hr>
+          <ul class="nav nav-pills flex-column mb-auto">
+            <li class="nav-item">
+              <a href="/dashboard/server/<%= guild.id %>" class="nav-link">
+                <i class="bi bi-speedometer2 me-2"></i>Overview
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/server/<%= guild.id %>/moderation" class="nav-link active">
+                <i class="bi bi-shield-lock me-2"></i>Moderation
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/server/<%= guild.id %>/automod" class="nav-link">
+                <i class="bi bi-robot me-2"></i>Auto Moderation
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="/dashboard/server/<%= guild.id %>/logs" class="nav-link">
+                <i class="bi bi-list-ul me-2"></i>Logging
+              </a>
+            </li>
+          </ul>
+          <hr>
+          <div class="text-center">
+            <a href="/dashboard" class="btn btn-outline-secondary btn-sm">
+              <i class="bi bi-arrow-left me-2"></i>Back to Servers
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Main Content -->
+      <div class="col-lg-9 col-md-8 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="display-6 fw-bold">Moderation Settings</h1>
+          <a href="https://discord.com/channels/<%= guild.id %>" target="_blank" class="btn btn-primary">
+            <i class="bi bi-box-arrow-up-right me-2"></i>Open Server
+          </a>
+        </div>
+        
+        <!-- Status Message -->
+        <div id="statusMessage" class="alert d-none mb-4"></div>
+        
+        <!-- Moderation Settings Form -->
+        <div class="card mb-4">
+          <div class="card-header py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-gear-fill me-2"></i>Basic Settings</h5>
+          </div>
+          <div class="card-body">
+            <form id="moderationForm">
+              <div class="mb-3">
+                <label for="moderationRoleId" class="form-label">Moderation Role</label>
+                <select class="form-select" id="moderationRoleId" name="moderationRoleId">
+                  <option value="">None</option>
+                  <% if (guild.roles && Array.isArray(guild.roles)) { %>
+                    <% guild.roles.forEach(role => { %>
+                      <option value="<%= role.id %>" <%= (config && config.moderationRoleId === role.id) ? 'selected' : '' %>>
+                        <%= role.name %>
+                      </option>
+                    <% }); %>
+                  <% } %>
+                </select>
+                <div class="form-text">Users with this role will be able to use moderation commands.</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="modLogChannelId" class="form-label">Moderation Log Channel</label>
+                <select class="form-select" id="modLogChannelId" name="modLogChannelId">
+                  <option value="">None</option>
+                  <% if (guild.channels && Array.isArray(guild.channels)) { %>
+                    <% guild.channels.forEach(channel => { %>
+                      <option value="<%= channel.id %>" <%= (config && config.modLogChannelId === channel.id) ? 'selected' : '' %>>
+                        #<%= channel.name %>
+                      </option>
+                    <% }); %>
+                  <% } %>
+                </select>
+                <div class="form-text">Channel where moderation actions will be logged.</div>
+              </div>
+              
+              <div class="mb-3">
+                <label for="muteRoleId" class="form-label">Mute Role</label>
+                <select class="form-select" id="muteRoleId" name="muteRoleId">
+                  <option value="">None</option>
+                  <% if (guild.roles && Array.isArray(guild.roles)) { %>
+                    <% guild.roles.forEach(role => { %>
+                      <option value="<%= role.id %>" <%= (config && config.muteRoleId === role.id) ? 'selected' : '' %>>
+                        <%= role.name %>
+                      </option>
+                    <% }); %>
+                  <% } %>
+                </select>
+                <div class="form-text">Role that will be applied to muted users.</div>
+              </div>
+              
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-save me-2"></i>Save Settings
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <!-- Warning Thresholds -->
+        <div class="card mb-4">
+          <div class="card-header py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-exclamation-triangle-fill me-2"></i>Warning Thresholds</h5>
+          </div>
+          <div class="card-body">
+            <form id="thresholdsForm">
+              <div class="alert alert-info mb-3">
+                <i class="bi bi-info-circle me-2"></i>
+                Configure automatic actions based on warning count. Set to 0 or leave empty to disable.
+              </div>
+              
+              <div class="row">
+                <div class="col-md-4 mb-3">
+                  <label for="autoMuteThreshold" class="form-label">Auto-Mute after X warnings</label>
+                  <input type="number" class="form-control" id="autoMuteThreshold" name="autoMuteThreshold" min="0" value="<%= (config && config.warnThresholds && config.warnThresholds.muteThreshold) || '' %>">
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                  <label for="autoKickThreshold" class="form-label">Auto-Kick after X warnings</label>
+                  <input type="number" class="form-control" id="autoKickThreshold" name="autoKickThreshold" min="0" value="<%= (config && config.warnThresholds && config.warnThresholds.kickThreshold) || '' %>">
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                  <label for="autoBanThreshold" class="form-label">Auto-Ban after X warnings</label>
+                  <input type="number" class="form-control" id="autoBanThreshold" name="autoBanThreshold" min="0" value="<%= (config && config.warnThresholds && config.warnThresholds.banThreshold) || '' %>">
+                </div>
+              </div>
+              
+              <div class="d-grid">
+                <button type="submit" class="btn btn-primary btn-lg">
+                  <i class="bi bi-save me-2"></i>Save Thresholds
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        
+        <!-- User Lookup -->
+        <div class="card">
+          <div class="card-header py-3">
+            <h5 class="mb-0 fw-bold"><i class="bi bi-search me-2"></i>User Lookup</h5>
+          </div>
+          <div class="card-body">
+            <form id="userLookupForm" class="mb-4">
+              <div class="input-group">
+                <input type="text" class="form-control" id="userLookup" placeholder="User ID or Username">
+                <button class="btn btn-primary" type="submit">
+                  <i class="bi bi-search me-2"></i>Search
+                </button>
+              </div>
+            </form>
+            
+            <div id="userInfractions" class="d-none">
+              <h6 class="border-bottom pb-2 mb-3 fw-bold">User Infractions</h6>
+              <div id="infractionsList">
+                <!-- Infractions will be loaded here -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="py-4 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5><i class="bi bi-shield-check me-2"></i> ModControl Panel</h5>
+          <p class="text-white-50">A powerful moderation tool for server management.</p>
+        </div>
+        <div class="col-md-3">
+          <h5 class="text-white">Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="/" class="text-white-50">Home</a></li>
+            <li><a href="/dashboard" class="text-white-50">Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5 class="text-white">Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="#" class="text-white-50">Help Center</a></li>
+          </ul>
+        </div>
+      </div>
+      <hr class="bg-secondary">
+      <div class="text-center">
+        <p class="mb-0 text-white-50">&copy; <%= new Date().getFullYear() %> ModControl Panel. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/main.js"></script>
+  <script>
+    // Helper function to show status messages
+    function showStatusMessage(message, type) {
+      const statusEl = document.getElementById('statusMessage');
+      statusEl.textContent = message;
+      statusEl.className = `alert alert-${type} mb-4`;
+      statusEl.classList.remove('d-none');
+      
+      // Hide the message after 5 seconds
+      setTimeout(() => {
+        statusEl.classList.add('d-none');
+      }, 5000);
+    }
+    
+    // Submit moderation settings form
+    document.getElementById('moderationForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      
+      fetch('/api/server/<%= guild.id %>/moderation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showStatusMessage('Moderation settings saved successfully!', 'success');
+        } else {
+          showStatusMessage('Failed to save settings: ' + data.message, 'danger');
+        }
+      })
+      .catch(error => {
+        console.error('Error saving moderation settings:', error);
+        showStatusMessage('An error occurred while saving settings.', 'danger');
+      });
+    });
+    
+    // Submit warning thresholds form
+    document.getElementById('thresholdsForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const data = Object.fromEntries(formData.entries());
+      
+      fetch('/api/server/<%= guild.id %>/moderation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showStatusMessage('Warning thresholds saved successfully!', 'success');
+        } else {
+          showStatusMessage('Failed to save thresholds: ' + data.message, 'danger');
+        }
+      })
+      .catch(error => {
+        console.error('Error saving warning thresholds:', error);
+        showStatusMessage('An error occurred while saving thresholds.', 'danger');
+      });
+    });
+    
+    // Handle user lookup
+    document.getElementById('userLookupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const userId = document.getElementById('userLookup').value.trim();
+      if (!userId) return;
+      
+      const infractionsList = document.getElementById('infractionsList');
+      infractionsList.innerHTML = `
+        <div class="text-center py-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Loading user infractions...</p>
+        </div>
+      `;
+      
+      document.getElementById('userInfractions').classList.remove('d-none');
+      
+      fetch(`/api/server/<%= guild.id %>/infractions/${userId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.infractions.length > 0) {
+            let html = '<ul class="list-group">';
+            
+            data.infractions.forEach(infraction => {
+              const date = new Date(infraction.createdAt).toLocaleString();
+              let badgeClass = 'bg-info';
+              
+              switch(infraction.type) {
+                case 'warning':
+                  badgeClass = 'bg-warning';
+                  break;
+                case 'mute':
+                  badgeClass = 'bg-secondary';
+                  break;
+                case 'kick':
+                  badgeClass = 'bg-danger';
+                  break;
+                case 'ban':
+                  badgeClass = 'bg-danger';
+                  break;
+              }
+              
+              html += `
+                <li class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="badge ${badgeClass} mb-2">${infraction.type.toUpperCase()}</span>
+                      <p class="mb-0">Reason: ${infraction.reason}</p>
+                      <small class="text-muted">By: ${infraction.moderatorId} on ${date}</small>
+                    </div>
+                  </div>
+                </li>
+              `;
+            });
+            
+            html += '</ul>';
+            infractionsList.innerHTML = html;
+          } else {
+            infractionsList.innerHTML = '<div class="alert alert-info">No infractions found for this user.</div>';
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching user infractions:', error);
+          infractionsList.innerHTML = '<div class="alert alert-danger">Error loading infractions. Please try again.</div>';
+        });
+    });
+  </script>
+</body>
+</html> 

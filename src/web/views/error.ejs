@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> - Discord Moderation Bot</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container">
+      <a class="navbar-brand" href="/">
+        <i class="bi bi-shield-check me-2"></i>
+        Discord Mod Bot
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/dashboard">Dashboard</a>
+          </li>
+        </ul>
+        <div class="d-flex">
+          <% if (typeof user !== 'undefined' && user) { %>
+            <div class="dropdown">
+              <button class="btn btn-outline-light dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                <% if (user.avatar) { %>
+                  <img src="https://cdn.discordapp.com/avatars/<%= user.discordId %>/<%= user.avatar %>.png" alt="<%= user.username %>" class="avatar-small me-2">
+                <% } else { %>
+                  <i class="bi bi-person-circle me-2"></i>
+                <% } %>
+                <%= user.username %>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="/dashboard">Dashboard</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+              </ul>
+            </div>
+          <% } else { %>
+            <a href="/auth/login" class="btn btn-outline-light">
+              <i class="bi bi-discord me-2"></i> Login with Discord
+            </a>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Error Content -->
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-md-8 text-center">
+        <div class="card bg-light shadow">
+          <div class="card-body p-5">
+            <i class="bi bi-exclamation-triangle-fill text-danger display-1 mb-4"></i>
+            <h1 class="mb-4"><%= title %></h1>
+            <div class="alert alert-danger">
+              <%= error %>
+            </div>
+            <p class="mt-4">Sorry for the inconvenience. You can try again or go back to the home page.</p>
+            <div class="mt-4">
+              <a href="/" class="btn btn-primary me-2">
+                <i class="bi bi-house-door me-2"></i>Home
+              </a>
+              <button onclick="window.history.back()" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4 mt-5">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5><i class="bi bi-shield-check me-2"></i> Discord Moderation Bot</h5>
+          <p>A powerful moderation tool for Discord servers.</p>
+        </div>
+        <div class="col-md-3">
+          <h5>Links</h5>
+          <ul class="list-unstyled">
+            <li><a href="/" class="text-white">Home</a></li>
+            <li><a href="/dashboard" class="text-white">Dashboard</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h5>Support</h5>
+          <ul class="list-unstyled">
+            <li><a href="https://discord.gg/your-support-server" class="text-white">Discord Server</a></li>
+          </ul>
+        </div>
+      </div>
+      <hr>
+      <div class="text-center">
+        <p class="mb-0">&copy; <%= new Date().getFullYear() %> Discord Moderation Bot. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html> 
